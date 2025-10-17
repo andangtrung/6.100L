@@ -1,7 +1,7 @@
 # Problem Set 2, hangman.py
 # Name: An Dang Trung
 # Collaborators: None
-# Time spent: 0:10
+# Time spent: 0:30
 
 import random
 import string
@@ -153,6 +153,7 @@ def hangman(secret_word, with_help):
     letters_guessed = ""
     guesses_remaining = 10
     word_progress = "*" * len(secret_word)
+    vowels = "aeiou"
 
     while not has_player_won(secret_word, letters_guessed):
         print("--------------")
@@ -164,14 +165,22 @@ def hangman(secret_word, with_help):
         guess = input("Please guess a letter: ").lower()
 
         if guess.isalpha() and len(guess) == 1:
-            letters_guessed += guess
-            word_progress = get_word_progress(secret_word, letters_guessed)
+            if guess not in letters_guessed:
+                letters_guessed += guess
+                word_progress = get_word_progress(secret_word, letters_guessed)
 
-            if guess in secret_word:
-                print(f"Good guess: {word_progress}")
+                if guess in secret_word:
+                    print(f"Good guess: {word_progress}")
+                else:
+                    if guess in vowels:
+                        guesses_remaining -= 2
+                    else:
+                        guesses_remaining -= 1
+
+                    print(f"Oops! That letter is not in my word: {word_progress}")
+
             else:
-                guesses_remaining -= 1
-                print(f"Oops! That letter is not in my word: {word_progress}")
+                print(f"Oops! You've already guessed that letter: {word_progress}")
 
         else:
             print(
