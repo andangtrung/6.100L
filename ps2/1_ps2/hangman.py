@@ -107,6 +107,25 @@ def get_available_letters(letters_guessed):
     return available_letters
 
 
+def reveal_letter(secret_word, available_letters):
+    """
+    secret_word: string, the secret word to guess.
+    available_letters: string, comprised of letters that represents which letters have not yet been guessed.
+
+    returns: string, a letter in secret_word that have not been guessed
+    """
+    choose_from = ""
+
+    for letter in secret_word:
+        if letter in available_letters:
+            choose_from += letter
+
+    new = random.randint(0, len(choose_from) - 1)
+    revealed_letter = choose_from[new]
+
+    return revealed_letter
+
+
 def hangman(secret_word, with_help):
     """
     secret_word: string, the secret word to guess.
@@ -157,7 +176,11 @@ def hangman(secret_word, with_help):
 
     while not has_player_won(secret_word, letters_guessed):
         print("--------------")
-        print(f"You have {guesses_remaining} guesses left.")
+
+        if guesses_remaining != 1:
+            print(f"You have {guesses_remaining} guesses left.")
+        else:
+            print(f"You have {guesses_remaining} guess left.")
 
         available_letters = get_available_letters(letters_guessed)
         print(f"Available letters: {available_letters}")
@@ -181,6 +204,19 @@ def hangman(secret_word, with_help):
 
             else:
                 print(f"Oops! You've already guessed that letter: {word_progress}")
+
+        elif guess == "!" and with_help:
+            if guesses_remaining >= 3:
+                guesses_remaining -= 3
+                guess = reveal_letter(secret_word, available_letters)
+                letters_guessed += guess
+                word_progress = get_word_progress(secret_word, letters_guessed)
+
+                print(f"Letter revealed: {guess}")
+                print(word_progress)
+
+            else:
+                print(f"Oops! Not enough guesses left: {word_progress}")
 
         else:
             print(
