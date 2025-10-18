@@ -1,7 +1,7 @@
 # Problem Set 2, hangman.py
 # Name: An Dang Trung
 # Collaborators: None
-# Time spent: 0:30
+# Time spent: 1:00
 
 import random
 import string
@@ -174,8 +174,22 @@ def hangman(secret_word, with_help):
     word_progress = "*" * len(secret_word)
     vowels = "aeiou"
 
-    while not has_player_won(secret_word, letters_guessed):
+    while True:
         print("--------------")
+
+        if has_player_won(secret_word, letters_guessed):
+            total_score = (guesses_remaining + 4 * len(set(secret_word))) + (
+                3 * len(secret_word)
+            )
+
+            print("Congratulations, you won!")
+            print(f"Your total score for this game is: {total_score}")
+
+            break
+
+        if guesses_remaining <= 0:
+            print(f"Sorry, you ran out of guesses. The word was {secret_word}.")
+            break
 
         if guesses_remaining != 1:
             print(f"You have {guesses_remaining} guesses left.")
@@ -230,9 +244,9 @@ def hangman(secret_word, with_help):
 if __name__ == "__main__":
     # To test your game, uncomment the following three lines.
 
-    secret_word = choose_word(wordlist)
-    with_help = False
-    hangman(secret_word, with_help)
+    # secret_word = choose_word(wordlist)
+    # with_help = False
+    # hangman(secret_word, with_help)
 
     # After you complete with_help functionality, change with_help to True
     # and try entering "!" as a guess!
