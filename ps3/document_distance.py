@@ -55,11 +55,11 @@ def get_frequencies(input_iterable):
     """
     dict = {}
 
-    for char in input_iterable:
-        if char in dict.keys():
-            dict[char] += 1
+    for i in input_iterable:
+        if i in dict.keys():
+            dict[i] += 1
         else:
-            dict[char] = 1
+            dict[i] = 1
 
     return dict
 
@@ -74,7 +74,15 @@ def get_letter_frequencies(word):
         is a letter in word and the corresponding int
         is the frequency of the letter in word
     """
-    pass
+    dict = {}
+
+    for letter in word:
+        if letter in dict.keys():
+            dict[letter] += 1
+        else:
+            dict[letter] = 1
+
+    return dict
 
 
 ### Problem 3: Similarity ###
