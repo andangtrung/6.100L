@@ -121,15 +121,11 @@ def calculate_similarity_score(freq_dict1, freq_dict2):
             keys_list.append(key)
 
     for key in keys_list:
-        if key in freq_dict1.keys() and key in freq_dict2.keys():
-            diff += abs(freq_dict1[key] - freq_dict2[key])
-            all += freq_dict1[key] + freq_dict2[key]
-        elif key not in freq_dict1.keys():
-            diff += freq_dict2[key]
-            all += freq_dict2[key]
-        else:
-            diff += freq_dict1[key]
-            all += freq_dict1[key]
+        freq1 = freq_dict1[key] if key in freq_dict1.keys() else 0
+        freq2 = freq_dict2[key] if key in freq_dict2.keys() else 0
+
+        diff += abs(freq1 - freq2)
+        all += freq1 + freq2
     
     return round(1 - (diff / all), 2)
 
@@ -160,17 +156,16 @@ def get_most_frequent_words(freq_dict1, freq_dict2):
         freq_dict[k] += v
     
     highest = 0
-    for v in freq_dict.values():
-        if v > highest:
-            highest = v
+    for freq in freq_dict.values():
+        if freq > highest:
+            highest = freq
     
     words_list = []
     for k in freq_dict.keys():
-        print(freq_dict[k])
         if freq_dict[k] == highest:
             words_list.append(k)
 
-    return words_list
+    return sorted(words_list)
 
 
 ### Problem 5: Finding TF-IDF ###
@@ -185,7 +180,15 @@ def get_tf(file_path):
         in the document) / (total number of words in the document)
     * Think about how we can use get_frequencies from earlier
     """
-    pass
+    words_list = text_to_list(load_file(file_path))
+    freq = get_frequencies(words_list)
+    number_of_words = len(words_list)
+    tf = {}
+    
+    for word in freq.keys():
+        tf[word] = freq[word] / number_of_words
+    
+    return tf
 
 def get_idf(file_paths):
     """
@@ -199,7 +202,27 @@ def get_idf(file_paths):
     with math.log10()
 
     """
-    pass
+    text_list = []
+    for path in file_paths:
+        text_list.append(text_to_list(load_file(path)))
+    
+    words_list = []
+    for text in text_list:
+        for word in text:
+            if word not in words_list:
+                words_list.append(word)
+    
+    total = len(file_paths)
+    idf = {}
+    for word in words_list:
+        count = 0
+        for text in text_list:
+            if word in text:
+                count += 1
+        
+        idf[word] = math.log10(total / count)
+
+    return idf
 
 def get_tfidf(tf_file_path, idf_file_paths):
     """
@@ -214,7 +237,16 @@ def get_tfidf(tf_file_path, idf_file_paths):
 
         * TF-IDF(i) = TF(i) * IDF(i)
         """
-    pass
+    tf = get_tf(tf_file_path)
+    idf = get_idf(idf_file_paths)
+    tf_idf = []
+
+    for key in tf.keys():
+        tf_idf.append((key, tf[key] * idf[key]))
+
+    tf_idf.sort(key=lambda x: (x[1], x[0]))
+    
+    return tf_idf
 
 
 if __name__ == "__main__":
@@ -269,11 +301,11 @@ if __name__ == "__main__":
     # print(most_frequent)      # should print ["hello", "world"]
 
     ## Tests Problem 5: Find TF-IDF
-    # tf_text_file = 'tests/student_tests/hello_world.txt'
-    # idf_text_files = ['tests/student_tests/hello_world.txt', 'tests/student_tests/hello_friends.txt']
-    # tf = get_tf(tf_text_file)
-    # idf = get_idf(idf_text_files)
-    # tf_idf = get_tfidf(tf_text_file, idf_text_files)
-    # print(tf)     # should print {'hello': 0.6666666666666666, 'world': 0.3333333333333333}
-    # print(idf)    # should print {'hello': 0.0, 'world': 0.3010299956639812, 'friends': 0.3010299956639812}
-    # print(tf_idf) # should print [('hello', 0.0), ('world', 0.10034333188799373)]
+    tf_text_file = 'tests/student_tests/hello_world.txt'
+    idf_text_files = ['tests/student_tests/hello_world.txt', 'tests/student_tests/hello_friends.txt']
+    tf = get_tf(tf_text_file)
+    idf = get_idf(idf_text_files)
+    tf_idf = get_tfidf(tf_text_file, idf_text_files)
+    print(tf)     # should print {'hello': 0.6666666666666666, 'world': 0.3333333333333333}
+    print(idf)    # should print {'hello': 0.0, 'world': 0.3010299956639812, 'friends': 0.3010299956639812}
+    print(tf_idf) # should print [('hello', 0.0), ('world', 0.10034333188799373)]
